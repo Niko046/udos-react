@@ -168,6 +168,7 @@ if(this.state.form.nombres!=null && this.state.form.apellidos!=null && this.stat
   }
   cookies.remove('identificador', {path: "/"});
   cookies.remove('identificador', {path: "/principal"});
+  cookies.remove('identificador', {path: "/lider"});
 
   this.peticionGet();
   }
