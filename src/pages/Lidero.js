@@ -15,6 +15,7 @@ class Lidero extends Component {
 
     cerrarSesion=()=>{
         cookies.remove('identificador', {path: "/principal"});
+        cookies.remove('identificador', {path: "/"});
         window.location.href='./principal';
     }
 

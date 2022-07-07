@@ -166,6 +166,8 @@ if(this.state.form.nombres!=null && this.state.form.apellidos!=null && this.stat
     if(!cookies.get('username')){
       window.location.href="./";
   }
+  cookies.remove('identificador', {path: "/"});
+  cookies.remove('identificador', {path: "/principal"});
 
   this.peticionGet();
   }
@@ -173,6 +175,8 @@ if(this.state.form.nombres!=null && this.state.form.apellidos!=null && this.stat
   cerrarSesion=()=>{
     cookies.remove('id', {path: "/"});
     cookies.remove('username', {path: "/"});
+    cookies.remove('identificador', {path: "/principal"});
+    cookies.remove('identificador', {path: "/"});
     window.location.href='./';
 }
 

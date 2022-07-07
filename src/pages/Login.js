@@ -49,9 +49,10 @@ class Login extends Component {
     }
   
     componentDidMount() {
-        if(cookies.get('username')){
-          alert(`Hola`);
-        }
+        cookies.remove('username', {path: "/"});
+        cookies.remove('identificador', {path: "/principal"});
+        cookies.remove('identificador', {path: "/"});
+        cookies.remove('identificador', {path: "/lider"});
     }
     
   
