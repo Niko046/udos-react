@@ -7,8 +7,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleXmark, faEdit, faEye, faPrint, faTrashAlt, faEnvelope, faPhone } from '@fortawesome/free-solid-svg-icons';
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import swal from 'sweetalert';
-const url = "http://localhost:8080/api/v1/promovido/";
-const ur2 = "http://localhost:8080/api/v1/promovido/promovidos/";
+const url = "https://udos.herokuapp.com/api/v1/promovido/";
+const ur2 = "https://udos.herokuapp.com/api/v1/promovido/promovidos/";
 const cookies = new Cookies();
 
 class Lidero extends Component {

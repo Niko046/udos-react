@@ -11,9 +11,9 @@ import { faCircleXmark, faEdit, faEye, faPrint, faTrashAlt, faEnvelope, faPhone 
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import ReactToPrint from 'react-to-print';
 import swal from 'sweetalert';
-const url = "http://localhost:8080/api/v1/lider/";
-const ur2 = "http://localhost:8080/api/v1/promovido/promovidos/";
-const ur3 = "http://localhost:8080/api/v1/promovido/";
+const url = "https://udos.herokuapp.com/api/v1/lider/";
+const ur2 = "https://udos.herokuapp.com/api/v1/promovido/promovidos/";
+const ur3 = "https://udos.herokuapp.com/api/v1/promovido/";
 
 const cookies = new Cookies();
 

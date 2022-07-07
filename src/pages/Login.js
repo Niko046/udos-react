@@ -5,7 +5,7 @@ import axios from 'axios';
 import swal from 'sweetalert';
 import Cookies from 'universal-cookie';
 
-const baseUrl="http://localhost:8080/api/v1/usuario/";
+const baseUrl="https://udos.herokuapp.com/api/v1/usuario/";
 const cookies = new Cookies();
 
 class Login extends Component {
