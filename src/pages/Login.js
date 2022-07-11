@@ -5,7 +5,7 @@ import axios from 'axios';
 import swal from 'sweetalert';
 import Cookies from 'universal-cookie';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { faUser , faRightToBracket} from '@fortawesome/free-solid-svg-icons';
 import logotipo from '../assets/images/logoo.jpeg';
 
 const baseUrl="https://udos.herokuapp.com/api/v1/usuario/";
@@ -50,42 +50,55 @@ class Login extends Component {
             this.setState({ test: 1 });
             swal(`Bienvenido`);
             window.location.href="./principal";
-
           }
-          
         })
         
+        
+
+
+        axios.get(baseUr2).then(response => {
+          this.setState({ administrador: response.data.data });
+          this.state.administrador.map(administrado => {
+            if(administrado.username== this.state.form.username && administrado.password== this.state.form.password){
+              cookies.set('idCoordinador', administrado.username, {path: "/"});
+              this.setState({ test: 1 });
+              swal(`Bienvenido`);
+              window.location.href="./coordinador";
+            }
+          })
+
+
+          axios.get(baseUr3).then(response => {
+            this.setState({ administrador: response.data.data });
+            this.state.administrador.map(administrado => {
+              if(administrado.username== this.state.form.username && administrado.password== this.state.form.password){
+                cookies.set('idLider', administrado.username, {path: "/"});
+                cookies.set('nombreL', administrado.nombres, {path: "/"});
+                cookies.set('ApellidoL', administrado.apellido_paterno +" " + administrado.apellido_materno ,{path: "/"});
+                this.setState({ test: 1 });
+                swal(`Bienvenido`);
+                window.location.href="./lider";
+              }
+            })
+            if (this.state.test==0){swal(`Usuario o contraseña incorrectos`);} 
+          })
+
+        })
+
+
+
+
+
       })
 
 
     
-      axios.get(baseUr2).then(response => {
-        this.setState({ administrador: response.data.data });
-        this.state.administrador.map(administrado => {
-          if(administrado.username== this.state.form.username && administrado.password== this.state.form.password){
-            cookies.set('idCoordinador', administrado.username, {path: "/"});
-            this.setState({ test: 1 });
-            swal(`Bienvenido`);
-            window.location.href="./coordinador";
-          }
-        })
-      })
-
-      axios.get(baseUr3).then(response => {
-        this.setState({ administrador: response.data.data });
-        this.state.administrador.map(administrado => {
-          if(administrado.username== this.state.form.username && administrado.password== this.state.form.password){
-            cookies.set('idLider', administrado.username, {path: "/"});
-            cookies.set('nombreL', administrado.nombres, {path: "/"});
-            cookies.set('ApellidoL', administrado.apellido_paterno +" " + administrado.apellido_materno ,{path: "/"});
-            this.setState({ test: 1 });
-            swal(`Bienvenido`);
-            window.location.href="./lider";
-          }
-        })
-      })
       
-      swal(`Usuario o contraseña incorrectos`);
+
+      
+      
+      
+      
       
   }
 
@@ -136,7 +149,7 @@ class Login extends Component {
               onChange={this.handleChange}
             />
             <br />
-            <button className="btn btn-primary" onClick={()=> this.iniciarSesion()}>Iniciar Sesión</button>
+            <button className="btn btn-primary" onClick={()=> this.iniciarSesion()}>Iniciar Sesión <FontAwesomeIcon icon={faRightToBracket}/></button>
           </div>
         </div>
       </div>
