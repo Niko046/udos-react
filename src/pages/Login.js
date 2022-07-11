@@ -17,6 +17,7 @@ var testigo=0;
 class Login extends Component {
     state={
       administrador: [],
+      test: 0,
       data: [],
         form:{
             id: '',
@@ -46,12 +47,14 @@ class Login extends Component {
         this.state.administrador.map(administrado => {
           if(administrado.id== this.state.form.username && administrado.password== this.state.form.password){
             cookies.set('idAdmin', administrado.id, {path: "/"});
+            this.setState({ test: 1 });
             swal(`Bienvenido`);
             window.location.href="./principal";
+
           }
           
         })
-        testigo=1;
+        
       })
 
 
@@ -61,6 +64,7 @@ class Login extends Component {
         this.state.administrador.map(administrado => {
           if(administrado.username== this.state.form.username && administrado.password== this.state.form.password){
             cookies.set('idCoordinador', administrado.username, {path: "/"});
+            this.setState({ test: 1 });
             swal(`Bienvenido`);
             window.location.href="./coordinador";
           }
@@ -74,13 +78,15 @@ class Login extends Component {
             cookies.set('idLider', administrado.username, {path: "/"});
             cookies.set('nombreL', administrado.nombres, {path: "/"});
             cookies.set('ApellidoL', administrado.apellido_paterno +" " + administrado.apellido_materno ,{path: "/"});
+            this.setState({ test: 1 });
             swal(`Bienvenido`);
             window.location.href="./lider";
           }
         })
       })
       
-
+      swal(`Usuario o contraseña incorrectos`);
+      
   }
 
 
@@ -91,6 +97,7 @@ class Login extends Component {
       cookies.remove('idAdmin', {path: "/"});
       cookies.remove('idCoordinador', {path: "/"});
       cookies.remove('idLider', {path: "/"});
+      testigo=0;
     }
     
   
