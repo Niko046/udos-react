@@ -14,10 +14,14 @@ const cookies = new Cookies();
 class Lidero extends Component {
 
     cerrarSesion=()=>{
-        cookies.remove('identificador', {path: "/principal"});
-        cookies.remove('identificador', {path: "/"});
-        window.location.href='./principal';
+        cookies.remove('idLider', {path: "/"});
+        window.location.href='./';
     }
+
+    atrasar=()=>{
+      cookies.remove('idLider', {path: "/"});
+      window.location.href='./coordinador';
+  }
 
 
 
@@ -47,7 +51,7 @@ class Lidero extends Component {
   
   
     peticionGet = () => {
-      axios.get(ur2+cookies.get('identificador')).then(response => {
+      axios.get(ur2+cookies.get('idLider')).then(response => {
         this.setState({ data: response.data.data });
       }).catch(error => {
         console.log(error.message);
@@ -55,8 +59,8 @@ class Lidero extends Component {
     }
   
     peticionPost = async () => { 
-        this.state.form.identificador=cookies.get('identificador');
-        this.state.form.nombrelider=cookies.get('nombreL') + " "+ cookies.get('ApellidoL');
+        this.state.form.identificador=cookies.get('idLider');
+        this.state.form.nombrelider=cookies.get('nombreL') +" "+cookies.get('ApellidoL');
         
       if(this.state.form!=null){
       if(this.state.form.usuarioCE!=null && this.state.form.nombre!=null && this.state.form.usuarioCE!='' && this.state.form.nombre!='' 
@@ -158,9 +162,9 @@ class Lidero extends Component {
     }
   
     componentDidMount() {
-        if(!cookies.get('identificador')){
-            window.location.href="./principal";
-        }
+      if(!cookies.get('idLider')){
+        window.location.href="./";
+    }
       this.peticionGet();
     }
   
@@ -174,22 +178,34 @@ class Lidero extends Component {
   
         <div className="App">
   
-          <nav className="navbar navbar-expand-lg bg-light border" id='Barra'>
-            <div className="container-fluid">
-              <ul className="navbar-nav mx-auto">
-                <li>
-                  <h1 className='mb-0'>Registro de promovidos de {" "+cookies.get('nombreL') +" "+cookies.get('ApellidoL')}</h1>
-                </li>
-              </ul>
-            </div>
-          </nav>
+
+  <header>
+        <div class="container">
+             
+            <p class="logo"> Registro de promovidos de {" "+cookies.get('nombreL') +" "+cookies.get('ApellidoL')}</p>
+        </div>
+    </header>
+
   
           <br></br>
          
           <button className="btn btn-success" onClick={() => { this.setState({ form: null, tipoModal: 'insertar' }); this.modalInsertar() }}>Crear Promovido</button>
           {"   "}
-          <button className="btn btn-warning" onClick={()=>this.cerrarSesion()}>Atras</button>
+          
+          {
+          
+          cookies.get('idCoordinador') ?
+                <button className="btn btn-warning" onClick={()=>this.atrasar()}>
+                  Atras
+                </button> : <button className="btn btn-danger" onClick={()=>this.cerrarSesion()}>
+                Cerrar sesion
+                </button>
+              }
+
+          
           <br /><br />
+          <h5> El numero de Promovidos registrados es: {this.state.data.length}</h5>
+        <br></br>
           <table className="table table-hover table-responsive text-justify">
             <thead className='table-dark '>
               <tr>

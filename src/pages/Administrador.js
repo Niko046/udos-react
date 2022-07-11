@@ -11,13 +11,13 @@ import { faCircleXmark, faEdit, faEye, faPrint, faTrashAlt, faEnvelope, faPhone 
 import { Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap';
 import ReactToPrint from 'react-to-print';
 import swal from 'sweetalert';
-const url = "https://udos.herokuapp.com/api/v1/lider/";
+const url = "https://udos.herokuapp.com/api/v1/coordinador/";
 const ur2 = "https://udos.herokuapp.com/api/v1/promovido/promovidos/";
 const ur3 = "https://udos.herokuapp.com/api/v1/promovido/";
 const ur4 = "https://udos.herokuapp.com/api/v1/lider/lideres/";
-
+const ur5 = "https://udos.herokuapp.com/api/v1/lider/";
 const cookies = new Cookies();
-
+var contador=0;
 
 
 
@@ -32,6 +32,7 @@ class App extends Component {
   state = {
     data: [],
     registros:[],
+    lideresE:[],
     modalInsertar: false,
     modalEliminar: false,
     form: {
@@ -40,14 +41,13 @@ class App extends Component {
       nombres: '',
       apellido_paterno: '',
       apellido_materno: '',
-      coordinador: '',
       tipoModal: ''
     }
   }
 
 
   peticionGet = () => {
-    axios.get(ur4+cookies.get('idCoordinador')).then(response => {
+    axios.get(url).then(response => {
       this.setState({ data: response.data.data });
     }).catch(error => {
       console.log(error.message);
@@ -55,13 +55,12 @@ class App extends Component {
   }
 
   peticionPost = async () => { 
-    this.state.form.coordinador=cookies.get('idCoordinador');
     if(this.state.form!=null){
 if(this.state.form.nombres!=null && this.state.form.nombres!='' && 
-this.state.form.apellido_paterno!=null  && this.state.form.apellido_paterno!=''&&
-this.state.form.apellido_materno!=null  && this.state.form.apellido_materno!=''&&
-this.state.form.username!=null  && this.state.form.username!=''&&
-this.state.form.password!=null  && this.state.form.password!=''){
+this.state.form.apellido_paterno!=null &&   this.state.form.apellido_paterno!='' 
+&& this.state.form.apellido_materno!=null && this.state.form.apellido_materno!='' &&
+this.state.form.username!=null && this.state.form.username!=''&&
+this.state.form.password!=null && this.state.form.password!=''){
     await axios.post(url, this.state.form).then(response => {
       this.modalInsertar();
       this.peticionGet();
@@ -88,20 +87,27 @@ this.state.form.password!=null  && this.state.form.password!=''){
   peticionDelete = () => {
     axios.delete(url + this.state.form.username).then(response => {
       
+      axios.get(ur4 + this.state.form.username).then(response => {
+        this.setState({ lideresE: response.data.data });
+        
 
-      axios.get(ur2 + this.state.form.username).then(response => {
-        this.setState({ registros: response.data.data });
-        console.log(this.state.registros);
-      
-
-        this.state.registros.map(registro => {
+        this.state.lideresE.map(liderE => {
           return (
-            axios.delete(ur3 + registro.curp).then(response => {
-              
+            axios.delete(ur5 + liderE.username).then(response => {
+              axios.get(ur2 + liderE.username).then(response => {
+                this.setState({registros: response.data.data})
+                this.state.registros.map(registro => {
+                  return (
+                    axios.delete(ur3 + registro.curp).then(response => { 
+                    })
+                  )
+                })
+              })
             })
           )
         })
       })
+
       this.setState({ modalEliminar: false });
       this.peticionGet();
 
@@ -113,7 +119,7 @@ this.state.form.password!=null  && this.state.form.password!=''){
   }
 
   liderSeleccionados = () => {
-    axios.delete(url + this.state.form.username).then(response => {
+    axios.delete(url + this.state.form.identificador).then(response => {
       this.setState({ modalEliminar: false });
       this.peticionGet();
     })
@@ -136,29 +142,24 @@ this.state.form.password!=null  && this.state.form.password!=''){
     this.setState({ modalEliminar: !this.state.modalEliminar })
   }
 
-  seleccionarLider = (lider) => {
+  seleccionarCoordinador = (coordinador) => {
     this.setState({
       tipoModal: 'actualizar',
       form: {
-        username: lider.username,
-        nombres: lider.nombres,
-        apellido_paterno: lider.apellido_paterno,
-        apellido_materno: lider.apellido_materno,
-        password: lider.password,
-        coordinador: lider.coordinador
+        username: coordinador.username,
+        nombres: coordinador.nombres,
+        apellido_paterno: coordinador.apellido_paterno,
+        apellido_materno: coordinador.apellido_materno,
+        password: coordinador.password
       }
       
     })
-    cookies.set('identificador', lider.username, {path: "/"});
-    cookies.set('idLider', lider.username, {path: "/"});
+    cookies.set('identificador', coordinador.identificador, {path: "/"});
   }
 
-  ObtenerLider = (lider) => {
-    cookies.set('idLider', lider.username, {path: "/"});
-    cookies.set('identificador', lider.username, {path: "/"});
-    cookies.set('nombreL', lider.nombres, {path: "/"});
-    cookies.set('ApellidoL', lider.apellido_paterno +" " + lider.apellido_materno ,{path: "/"});
-    window.location.href="./lider";
+  ObtenerCoordinador = (coordinador) => {
+    cookies.set('idCoordinador', coordinador.username, {path: "/"});
+    window.location.href="./coordinador";
   }
 
 
@@ -175,23 +176,18 @@ this.state.form.password!=null  && this.state.form.password!=''){
   }
 
   componentDidMount() {
-    if(!cookies.get('idCoordinador')){
+    if(!cookies.get('idAdmin')){
       window.location.href="./";
   }
-
+ 
   this.peticionGet();
   }
   
   cerrarSesion=()=>{
+    cookies.remove('idAdmin', {path: "/"});
     cookies.remove('idCoordinador', {path: "/"});
     cookies.remove('idLider', {path: "/"});
     window.location.href='./';
-}
-
-atrasar=()=>{
-  cookies.remove('idCoordinador', {path: "/"});
-  cookies.remove('idLider', {path: "/"});
-  window.location.href='./principal';
 }
 
 
@@ -207,24 +203,19 @@ atrasar=()=>{
 <header>
         <div class="container">
              
-            <p class="logo"> REGISTRO DE LIDERES</p>
+            <p class="logo"> REGISTRO DE COORDINADORES</p>
         </div>
     </header>
 
         <br></br>
 
-        <button className="btn btn-success" onClick={() => { this.setState({ form: null, tipoModal: 'insertar' }); this.modalInsertar() }}>Crear lider</button>
+
+        <button className="btn btn-success" onClick={() => { this.setState({ form: null, tipoModal: 'insertar' }); this.modalInsertar() }}>Crear coordinador</button>
         {"   "}
-        {
-          cookies.get('idAdmin') ?
-                <button className="btn btn-warning" onClick={()=>this.atrasar()}>
-                  Atras
-                </button> : <button className="btn btn-danger" onClick={()=>this.cerrarSesion()}>
-                Cerrar sesion
-                </button>
-              }
+        <button className="btn btn-danger" onClick={()=>this.cerrarSesion()}>Cerrar Sesión</button>
         <br /><br />
-        <h5> El numero de Lideres registrados es: {this.state.data.length}</h5>
+
+        <h5> El numero de Coordinadores registrados es: {this.state.data.length}</h5>
         <br></br>
         <table className="table table-hover table-responsive text-justify">
           <thead className='table-dark '>
@@ -237,19 +228,20 @@ atrasar=()=>{
             </tr>
           </thead>
           <tbody>
-            {this.state.data.map(lider => {
+            {this.state.data.map(coordinador => {
+              contador++;
               return (
-                <tr key={lider.username}>
-                  <td>{lider.username}</td>
-                  <td>{lider.nombres}</td>
-                  <td>{lider.apellido_paterno}</td>
-                  <td>{lider.apellido_materno}</td>
+                <tr key={coordinador.username}>
+                  <td>{coordinador.username}</td>
+                  <td>{coordinador.nombres}</td>
+                  <td>{coordinador.apellido_paterno}</td>
+                  <td>{coordinador.apellido_materno}</td>
                   <td>
-                    <button className="btn btn-primary" onClick={() => { this.seleccionarLider(lider); this.modalEditar() }}><FontAwesomeIcon icon={faEdit} /></button>
+                    <button className="btn btn-primary" onClick={() => { this.seleccionarCoordinador(coordinador); this.modalEditar() }}><FontAwesomeIcon icon={faEdit} /></button>
                     {"   "}
-                    <button className="btn btn-danger" onClick={() => { this.seleccionarLider(lider); this.setState({ modalEliminar: true }) }}><FontAwesomeIcon icon={faTrashAlt} /></button>
+                    <button className="btn btn-danger" onClick={() => { this.seleccionarCoordinador(coordinador); this.setState({ modalEliminar: true }) }}><FontAwesomeIcon icon={faTrashAlt} /></button>
                     {"   "}
-                    <button className="btn btn-warning" onClick={() => { this.ObtenerLider(lider);  }}><FontAwesomeIcon icon={faEye} /></button>
+                    <button className="btn btn-warning" onClick={() => { this.ObtenerCoordinador(coordinador);  }}><FontAwesomeIcon icon={faEye} /></button>
                   </td>
 
 
@@ -263,12 +255,12 @@ atrasar=()=>{
 
         <Modal isOpen={this.state.modalInsertar}>
           <ModalHeader style={{ display: 'block' }} className='bg-success text-white'>
-            CREAR NUEVO LIDER
+            CREAR NUEVO COORDINADOR
             <span style={{ float: 'right' }} onClick={() => this.modalInsertar()}><FontAwesomeIcon icon={faCircleXmark} /></span>
           </ModalHeader>
           <ModalBody>
             <div className="form-group">
-            <label htmlFor="nombres">Nombres</label>
+              <label htmlFor="nombres">Nombres</label>
               <input className="form-control" type="text" name="nombres" id="nombres" required onChange={this.handleChange} value={form ? form.nombres : ''} />
               <br />
               <label htmlFor="apellido_paterno">Apellido paterno</label>
@@ -301,25 +293,27 @@ atrasar=()=>{
 
         <Modal isOpen={this.state.modalEditar}>
           <ModalHeader style={{ display: 'block' }} className="bg-primary text-white">
-            ACTUALIZAR LIDER
+            ACTUALIZAR COORDINADOR
             <span style={{ float: 'right' }} onClick={() => this.modalEditar()}><FontAwesomeIcon icon={faCircleXmark} /></span>
           </ModalHeader>
           <ModalBody>
             <div className="form-group">
-              <label htmlFor="nombres">Nombres</label>
-              <input className="form-control" type="text" name="nombres" id="nombres"  onChange={this.handleChange} value={form ? form.nombres : this.state.data} />
+
+            <label htmlFor="nombres">Nombres</label>
+              <input className="form-control" type="text" name="nombres" id="nombres" onChange={this.handleChange} value={form ? form.nombres : this.state.data} />
               <br />
               <label htmlFor="apellido_paterno">Apellido paterno</label>
-              <input className="form-control" type="text" name="apellido_paterno" id="apellido_paterno" onChange={this.handleChange}  value={form ? form.apellido_paterno : this.state.data} />
+              <input className="form-control" type="text" name="apellido_paterno" id="apellido_paterno" onChange={this.handleChange} value={form ? form.apellido_paterno : this.state.data} />
               <br />
               <label htmlFor="apellido_materno">Apellido materno</label>
-              <input className="form-control" type="text" name="apellido_materno" id="apellido_materno" onChange={this.handleChange}  value={form ? form.apellido_materno : this.state.data} />
+              <input className="form-control" type="text" name="apellido_materno" id="apellido_materno" onChange={this.handleChange} value={form ? form.apellido_materno : this.state.data} />
               <br />
               <label htmlFor="username">Usuario</label>
-              <input className="form-control" type="text" name="username" id="username" readOnly required onChange={this.handleChange} value={form ? form.username : this.state.data} />
+              <input className="form-control" type="text" name="username" id="username" readOnly onChange={this.handleChange} value={form ? form.username : this.state.data} />
               <br />
               <label htmlFor="password">Contraseña</label>
-              <input className="form-control" type="text" name="password" id="password" required onChange={this.handleChange} value={form ? form.password : this.state.data} />
+              <input className="form-control" type="text" name="password" id="password" onChange={this.handleChange} value={form ? form.password : this.state.data} />
+
             </div>
           </ModalBody>
 
@@ -338,11 +332,11 @@ atrasar=()=>{
 
         <Modal isOpen={this.state.modalEliminar}>
           <ModalHeader style={{ display: 'block' }} className="bg-danger text-white">
-            ELIMINAR LIDER
+            ELIMINAR COORDINADOR
             <span style={{ float: 'right' }} onClick={() => this.modalEliminar()}><FontAwesomeIcon icon={faCircleXmark} /></span>
           </ModalHeader>
           <ModalBody>
-            Estás seguro que deseas eliminar a {form && form.nombres +" " +form.apellido_paterno+" "+ form.apellido_materno}
+            Estás seguro que deseas eliminar a {form && form.nombres +" " +form.apellido_paterno+" " +form.apellido_materno}
           </ModalBody>
           <ModalFooter>
             <button className="btn btn-danger" onClick={() => this.peticionDelete()}>Sí</button>
